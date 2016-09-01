@@ -68,7 +68,7 @@ function prepare_sources {
   stop mesos-master || true
   stop mesos-slave || true
   # Remove slave metadata to ensure slave start does not pick up old state.
-  rm -rf /var/lib/mesos/meta/slaves/latest
+  rm -rf /var/lib/mesos/meta/slaves/*
   start mesos-master
   start mesos-slave
 
@@ -87,6 +87,12 @@ EOF
   chown -R vagrant:vagrant /home/vagrant
 }
 
+function download_spark {
+  mkdir /opt/spark
+  wget -O /tmp/spark-2.0.0-bin-hadoop2.7.tgz http://d3kbcqa49mib13.cloudfront.net/spark-2.0.0-bin-hadoop2.7.tgz
+  tar -xzf /tmp/spark-2.0.0-bin-hadoop2.7.tgz -C /opt/spark --strip 1
+}
+
 prepare_sources
 prepare_extras
 install_cluster_config
@@ -94,4 +100,5 @@ install_ssh_config
 start_services
 configure_netrc
 sudoless_docker_setup
+download_spark
 su vagrant -c "aurorabuild all"
